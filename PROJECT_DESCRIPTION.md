@@ -1,6 +1,6 @@
 # Project Description
 
-**Deployed Frontend URL:** [Pending Vercel Deployment - Will be added after push to GitHub]
+**Deployed Frontend URL:** https://counter-dapp-taupe.vercel.app/
 
 **Solana Program ID:** `Gs88iGv4WFEC8zfTBRnpDqP895o61BKzyFbdWNtHtFuy`
 
