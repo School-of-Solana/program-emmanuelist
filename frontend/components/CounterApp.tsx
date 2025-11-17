@@ -16,6 +16,11 @@ export const CounterApp: FC = () => {
   const [totalIncrements, setTotalIncrements] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [counterExists, setCounterExists] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const getProvider = () => {
     if (!wallet.publicKey) return null;
@@ -91,9 +96,14 @@ export const CounterApp: FC = () => {
 
       console.log('Initialize transaction signature:', tx);
       await fetchCounter();
-    } catch (error) {
+      alert('Counter created successfully! 🎉');
+    } catch (error: any) {
       console.error('Error initializing counter:', error);
-      alert('Failed to initialize counter');
+      if (error.message?.includes('insufficient funds') || error.message?.includes('no record of a prior credit')) {
+        alert('❌ Insufficient funds. Please get some Devnet SOL from https://faucet.solana.com');
+      } else {
+        alert('Failed to initialize counter: ' + (error.message || 'Unknown error'));
+      }
     } finally {
       setLoading(false);
     }
@@ -120,9 +130,13 @@ export const CounterApp: FC = () => {
 
       console.log('Increment transaction signature:', tx);
       await fetchCounter();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error incrementing counter:', error);
-      alert('Failed to increment counter');
+      if (error.message?.includes('insufficient funds') || error.message?.includes('no record of a prior credit')) {
+        alert('❌ Insufficient funds for transaction fee. Get Devnet SOL from https://faucet.solana.com');
+      } else {
+        alert('Failed to increment counter: ' + (error.message || 'Unknown error'));
+      }
     } finally {
       setLoading(false);
     }
@@ -156,6 +170,14 @@ export const CounterApp: FC = () => {
       setLoading(false);
     }
   };
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 flex flex-col items-center justify-center p-4">
@@ -223,10 +245,23 @@ export const CounterApp: FC = () => {
         )}
       </div>
 
-      <div className="mt-8 text-white text-center">
+      <div className="mt-8 text-white text-center space-y-2">
         <p className="text-sm opacity-80">
           Built on Solana Devnet • School of Solana
         </p>
+        {wallet.publicKey && (
+          <p className="text-xs opacity-70">
+            Need Devnet SOL? Visit{' '}
+            <a 
+              href="https://faucet.solana.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="underline hover:opacity-100"
+            >
+              faucet.solana.com
+            </a>
+          </p>
+        )}
       </div>
     </div>
   );
